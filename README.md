@@ -15,7 +15,7 @@ As a trade-dependent small open economy, Singapore utilizes the Singapore Dollar
 ## 2. Data Description and Ethics
 
 - **Data Source:** NBER (National Bureau of Economic Research)
-- **Sample Window:** 2021-09-25 to 2026-09-25 ($N = 1,305$ valid daily trading observations)
+- **Sample Window:** 2021-09-27 to 2026-09-25 (1,305 dated rows in the raw file; 55 have no exchange-rate value, leaving 1,250 valid rates and 1,249 daily log returns)
 - **Target Variable:** Daily Log Returns ($r_t = \ln(S_t / S_{t-1}) \times 100\%$)
 - **Data Ethics:** Fully open public dataset. Raw data files are placed in `data/raw/` (git-ignored).
 
@@ -23,7 +23,7 @@ As a trade-dependent small open economy, Singapore utilizes the Singapore Dollar
 
 ## 3. Statistical Methodology
 
-This project evaluates two core course methods on the 1,305 daily return observations:
+This project evaluates two core course methods on the 1,249 daily log return observations:
 
 ### Method 1: Location and Uncertainty (CLT vs. Non-Parametric Bootstrap 95% CIs)
 
@@ -85,7 +85,7 @@ pip install -r requirements.txt
 
 ---
 
-## 5. Summary of Results ($N = 1,305$)
+## 5. Summary of Results ($N = 1,249$)
 
 ### Key Takeaway
 
