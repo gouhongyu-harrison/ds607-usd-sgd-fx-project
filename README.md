@@ -29,7 +29,14 @@ This project evaluates two core course methods on the 1,249 daily log return obs
 
 - **Parametric CLT (Wald):**
   $$\bar{r} = \frac{1}{N}\sum r_t, \quad \hat{\text{se}}(\bar{r}) = \frac{S_N}{\sqrt{N}}, \quad \text{CI}_{\text{CLT}} = \bar{r} \pm 1.96 \cdot \hat{\text{se}}(\bar{r})$$
-- **Non-Parametric Percentile Bootstrap:** Resample $B = 10{,}000$ times with replacement from $\{r_t\}$ to derive empirical $95\%$ percentile confidence limits $[\bar{r}^{*(250)}, \bar{r}^{*(9750)}]$.
+- **Non-Parametric Percentile Bootstrap:** Resample $B = 10{,}000$ samples of size $N$ with replacement from $\{r_t\}$. The standard error is the sample standard deviation of the bootstrap means, and the $95\%$ percentile confidence interval is given by their 2.5th and 97.5th percentiles.
+- **Non-Parametric Studentized Bootstrap:** For each resample, calculate $t^* = (\bar{r}^* - \bar{r}) / \widehat{\mathrm{se}}^*$, where $\widehat{\mathrm{se}}^*$ is that resample's standard error. The interval is $[\bar{r} - q_{0.975}(t^*)\widehat{\mathrm{se}}(\bar{r}),\; \bar{r} - q_{0.025}(t^*)\widehat{\mathrm{se}}(\bar{r})]$.
+
+#### Method 1 implementation and results
+
+The script saves the comparison table to `outputs/tables/method1_location_uncertainty.csv` and the bootstrap-mean histogram to `outputs/figures/method1_bootstrap_mean_distribution.png`. The histogram marks the CLT/Wald, percentile-bootstrap, and studentized-bootstrap interval endpoints with distinct line styles and colors.
+
+For the $N = 1{,}249$ daily log returns, the estimated mean is $-0.004664\%$. The CLT/Wald standard error is $0.008242\%$, compared with the bootstrap standard error of $0.008196\%$. The CLT/Wald 95% CI is $[-0.020819\%, 0.011491\%]$ (width $0.032310$ percentage points); the percentile-bootstrap 95% CI is $[-0.020702\%, 0.011136\%]$ (width $0.031838$ percentage points); and the studentized-bootstrap 95% CI is $[-0.020769\%, 0.011241\%]$ (width $0.032010$ percentage points). The three intervals are very similar and all include zero. This interval comparison is consistent with uncertainty around a mean close to zero; it is not a replacement for the formal zero-drift tests in Method 2.
 
 ### Method 2: Hypothesis Testing for Zero Drift (Wald $z$-Test vs. Permutation Test)
 
