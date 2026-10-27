@@ -43,8 +43,12 @@ For the $N = 1{,}249$ daily log returns, the estimated mean is $-0.004664\%$. Th
 - **Hypotheses:** $H_0: \mu = 0$ (No daily drift) vs. $H_1: \mu \neq 0$
 - **Parametric Wald Test:**
   $$z = \frac{\bar{r} - 0}{\hat{\text{se}}(\bar{r})}, \quad p_{\text{CLT}} = 2\left(1 - \Phi(|z|)\right)$$
-- **Null-Centered Permutation Test:** Shift data under $H_0$ ($r_t^0 = r_t - \bar{r}$), resample $B = 10{,}000$ times, and compute p-value with a $+1$ protection term:
+- **Sign-Flip Permutation Test:** Under $H_0$, the returns are symmetric around zero, so independently multiply each return $r_t$ by a random $+1$ or $-1$ and calculate the mean for each of $B = 10{,}000$ sign-flip samples. The two-sided p-value uses the observed mean and a $+1$ protection term:
   $$p_{\text{perm}} = \frac{1 + \sum_{b=1}^{B} \mathbf{1}(|\bar{r}^{*(b)}| \ge |\bar{r}|)}{B + 1}$$
+
+#### Method 2 implementation and results
+
+The script saves the test table to `outputs/tables/method2_hypothesis_test.csv`, the sign-flip permutation distribution to `outputs/figures/method2_permutation_distribution.png`, and the return-density comparison to `outputs/figures/method2_returns_vs_normal.png`. For the $N = 1{,}249$ daily log returns, the Wald z statistic is $-0.565826$, with a two-sided Wald p-value of $0.571512$ and a sign-flip permutation p-value of $0.570343$. At the 5% significance level, both tests fail to reject $H_0$, so the results do not support a non-zero mean daily return.
 
 ---
 
