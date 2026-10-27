@@ -1,12 +1,16 @@
 # ds607-usd-sgd-fx-project
 
-DS607 Group Project: Statistical Analysis of Daily USD/SGD Exchange Rate Dynamics
+DS607 Group Project: Statistical Analysis of USD/SGD Exchange Rate Dynamics
+
+This repository is DS607 group work for AY2026/27 August Term.
+
+**Team members:** Gou Hongyu, Jiang Liuru, and Sun Jiayi.
 
 ## 1. Executive Summary and Research Question
 
 ### Research Question
 
-"Does the daily log return of the USD/SGD exchange rate exhibit a statistically significant non-zero mean drift, and how do parametric CLT/Wald frameworks compare with non-parametric Bootstrap and Permutation inference in quantifying exchange rate location and uncertainty?"
+Does the mean of the observed USD/SGD log returns differ from zero, and do CLT/Wald and resampling-based confidence intervals and tests lead to consistent conclusions?
 
 ### Motivation
 
@@ -14,16 +18,17 @@ As a trade-dependent small open economy, Singapore utilizes the Singapore Dollar
 
 ## 2. Data Description and Ethics
 
-- **Data Source:** NBER (National Bureau of Economic Research)
-- **Sample Window:** 2021-09-27 to 2026-09-25 (1,305 dated rows in the raw file; 55 have no exchange-rate value, leaving 1,250 valid rates and 1,249 daily log returns)
-- **Target Variable:** Daily Log Returns ($r_t = \ln(S_t / S_{t-1}) \times 100\%$)
-- **Data Ethics:** Fully open public dataset. Raw data files are placed in `data/raw/` (git-ignored).
+- **Source:** NBER Macrohistory Database, series `DEXSIUS` ([database and access information](https://www.nber.org/research/data/nber-macrohistory-database)). The source workbook is included at `data/raw/DEXSIUS.xlsx`; the analysis-ready CSV is `data/processed/DEXSIUS_cleaned.csv`.
+- **Sample window:** 2021-09-27 to 2026-09-25. The raw file contains 1,305 dated rows; 55 have no exchange-rate value. The processed file contains 1,250 valid exchange rates and 1,249 non-missing log returns.
+- **Data dictionary:** `observation_date` is the observation date; `DEXSIUS` is the exchange-rate series as published by NBER; `log_return_pct` is $100\ln(S_t/S_{t-1})$. The first return is missing because there is no preceding observation.
+- **Cleaning and access:** The source workbook and processed CSV are committed, so running the analyses does not require separate data access. The processed CSV is used directly by the scripts; the transformation from workbook to CSV is not included as a script and should be documented or added for full end-to-end reproducibility. Missing return values are excluded during analysis. Missing dates in the source mean some intervals may span more than one day, so not every return necessarily represents a one-calendar-day change.
+- **Data ethics:** The repository contains the NBER source workbook and derived CSV. No SMU-licensed extract is used. Do not add licensed extracts, credentials, or `.env` files to a public repository.
 
 ---
 
 ## 3. Statistical Methodology
 
-This project evaluates two core course methods on the 1,249 daily log return observations:
+This project evaluates two course methods on the 1,249 available return observations. Both resampling procedures use 10,000 replicates and seed `60702`.
 
 ### Method 1: Location and Uncertainty (CLT vs. Non-Parametric Bootstrap 95% CIs)
 
@@ -34,7 +39,7 @@ This project evaluates two core course methods on the 1,249 daily log return obs
 
 #### Method 1 implementation and results
 
-The script saves the comparison table to `outputs/tables/method1_location_uncertainty.csv` and the bootstrap-mean histogram to `outputs/figures/method1_bootstrap_mean_distribution.png`. The histogram marks the CLT/Wald, percentile-bootstrap, and studentized-bootstrap interval endpoints with distinct line styles and colors.
+The script saves the comparison table to [method1_location_uncertainty.csv](outputs/tables/method1_location_uncertainty.csv) and the bootstrap-mean histogram to [method1_bootstrap_mean_distribution.png](outputs/figures/method1_bootstrap_mean_distribution.png). The histogram marks the CLT/Wald, percentile-bootstrap, and studentized-bootstrap interval endpoints with distinct line styles and colors.
 
 For the $N = 1{,}249$ daily log returns, the estimated mean is $-0.004664\%$. The CLT/Wald standard error is $0.008242\%$, compared with the bootstrap standard error of $0.008196\%$. The CLT/Wald 95% CI is $[-0.020819\%, 0.011491\%]$ (width $0.032310$ percentage points); the percentile-bootstrap 95% CI is $[-0.020702\%, 0.011136\%]$ (width $0.031838$ percentage points); and the studentized-bootstrap 95% CI is $[-0.020769\%, 0.011241\%]$ (width $0.032010$ percentage points). The three intervals are very similar and all include zero. This interval comparison is consistent with uncertainty around a mean close to zero; it is not a replacement for the formal zero-drift tests in Method 2.
 
@@ -48,7 +53,7 @@ For the $N = 1{,}249$ daily log returns, the estimated mean is $-0.004664\%$. Th
 
 #### Method 2 implementation and results
 
-The script saves the test table to `outputs/tables/method2_hypothesis_test.csv`, the sign-flip permutation distribution to `outputs/figures/method2_permutation_distribution.png`, and the return-density comparison to `outputs/figures/method2_returns_vs_normal.png`. For the $N = 1{,}249$ daily log returns, the Wald z statistic is $-0.565826$, with a two-sided Wald p-value of $0.571512$ and a sign-flip permutation p-value of $0.570343$. At the 5% significance level, both tests fail to reject $H_0$, so the results do not support a non-zero mean daily return.
+The script saves the test table to [method2_hypothesis_test.csv](outputs/tables/method2_hypothesis_test.csv), the sign-flip permutation distribution to [method2_permutation_distribution.png](outputs/figures/method2_permutation_distribution.png), and the return-density comparison to [method2_returns_vs_normal.png](outputs/figures/method2_returns_vs_normal.png). For $N = 1{,}249$, the Wald statistic is $-0.565826$ ($p=0.571512$), and the sign-flip permutation test gives $p=0.570343$. Both tests fail to reject $H_0$ at the 5% level; this is insufficient evidence of a non-zero mean, not proof that the mean is exactly zero.
 
 ---
 
@@ -63,36 +68,29 @@ ds607-usd-sgd-fx-project/
 ├── data/
 │   ├── raw/                     # Raw NBER exchange-rate data
 │   └── processed/               # Cleaned and processed datasets
-├── notebooks/                  # Analysis notebooks and exploratory work
-├── src/                        # Source scripts for data handling and inference
+├── src/                         # Analysis scripts
 ├── outputs/
 │   ├── figures/                 # Visualization outputs
 │   ├── tables/                  # Summary tables and model results
-│   └── presentation/            # Presentation materials and deck exports
+│   └── presentation/            # Required presentation PDF (not yet included)
 └── .gitignore                  # Repository ignore rules
 ```
 
 ### Dependencies
 
-The project dependencies are managed in `requirements.txt` and include the core packages required for data cleaning, inference, and visualization:
+The analysis dependencies and tested versions are pinned in `requirements.txt`.
 
-- `pandas>=2.0.0`
-- `numpy>=1.24.0`
-- `scipy>=1.10.0`
-- `matplotlib>=3.7.0`
-- `statsmodels>=0.14.0`
-- `yfinance>=0.2.0`
-
-Install them via:
+Install dependencies and run both analyses from the repository root:
 
 ```bash
-pip install -r requirements.txt
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python src/method1_location_uncertainty.py
+python src/method2_hypothesis_test.py
 ```
 
-### Reproducibility
-
-- All random sampling algorithms enforce a fixed random seed (`RNG = np.random.default_rng(60702)`).
-- Project scripts and analysis can be run after installing the dependencies above.
+Both scripts read the committed processed CSV using paths relative to the script and regenerate their tables and figures under `outputs/`. Bootstrap and permutation sampling use a fixed seed (`60702`) and 10,000 replicates.
 
 ---
 
@@ -100,17 +98,23 @@ pip install -r requirements.txt
 
 ### Key Takeaway
 
----
+The estimated mean return is $-0.004664\%$. All three 95% confidence intervals include zero: CLT/Wald $[-0.020819\%, 0.011491\%]$, percentile bootstrap $[-0.020702\%, 0.011136\%]$, and studentized bootstrap $[-0.020769\%, 0.011241\%]$. Their similar widths indicate that these methods give comparable uncertainty estimates for this sample.
+
+The Wald and sign-flip tests also give similar, non-significant results ($p=0.571512$ and $p=0.570343$). At the 5% level we do not reject a zero mean. See the linked tables and figures above for the full estimates and distributions.
 
 ## 6. Limitations
 
-1. **Independence Assumption:** Daily FX returns exhibit ARCH/GARCH volatility clustering. Block Bootstrap could be used in future work to handle autocorrelation.
-2. **Policy Regimes:** The 2021–2026 window includes Fed rate hikes and MAS policy tightening; sub-period analysis can further verify regime stability.
+1. **Observation intervals:** Missing values in the source series mean some retained observations may be more than one day apart. A dedicated cleaning script and interval-level sensitivity analysis would improve traceability.
+2. **Inference assumptions:** The Wald standard error treats observations as independent; FX returns can exhibit serial dependence and volatility clustering. The sign-flip test additionally relies on symmetry under the null. A block bootstrap or dependence-robust analysis would be useful follow-up work.
+3. **Policy regimes and sample window:** The 2021–2026 sample includes changing monetary-policy regimes; sub-period analysis could assess stability. Failure to reject the null does not establish that the true mean is zero.
 
 ---
 
-## 7. AI Usage and Contributions
+## 7. Presentation
 
-- **AI Usage:** Generative AI, primarily Gemini, was used as a coding assistant and writing support tool for code refinement, debugging, and documentation formatting.
-- **Human Verification:** All core statistical methods, empirical logic, hypothesis testing decisions, and final interpretations were designed, reviewed, and verified by the team.
-- **Contribution Statement:** This project reflects the team’s own analysis and judgment; AI was used as an assistive tool rather than a substitute for methodological reasoning.
+The DS607 guidelines require a presentation PDF in `outputs/presentation/`. That deck is not included in this repository snapshot and must be added before submission.
+
+## 8. AI Usage and Contributions
+
+- [AI_USAGE.md](AI_USAGE.md) documents the tools used and how outputs were checked.
+- [CONTRIBUTIONS.md](CONTRIBUTIONS.md) lists each member's project contributions.
